@@ -1,0 +1,28 @@
+{
+  "name": "flowfret",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "verify": "node scripts/verify-generate.mjs && node scripts/verify-arpeggio.mjs && node scripts/verify-duo.mjs"
+  },
+  "dependencies": {
+    "dexie": "^4.0.10",
+    "opensheetmusicdisplay": "^1.9.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tone": "^15.0.4",
+    "zustand": "^5.0.2"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@xmldom/xmldom": "^0.9.5",
+    "typescript": "^5.7.2",
+    "vite": "^6.0.5"
+  }
+}

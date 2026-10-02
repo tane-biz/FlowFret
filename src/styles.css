@@ -1,0 +1,569 @@
+/*
+ * 指示書§42：ゲーム風にしない。白背景・黒い五線譜・装飾を抑える・余白を十分に取る。
+ * 長時間見ても疲れないことを最優先。
+ */
+
+:root {
+  --ink: #1a1a1a;
+  --ink-soft: #5a5a5a;
+  --ink-faint: #8c8c8c;
+  --line: #dcdcdc;
+  --line-soft: #ededed;
+  --bg: #ffffff;
+  --bg-soft: #fafafa;
+  --accent: #1a3463;
+  --accent-soft: #e8eef7;
+  --radius: 6px;
+  --font: "Hiragino Kaku Gothic ProN", "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root { height: 100%; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 14px;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+}
+
+button, input { font-family: inherit; font-size: inherit; color: inherit; }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+/* ── 上部：曲名と操作 ─────────────────────────── */
+
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--line);
+}
+
+.topbar-title { display: flex; align-items: baseline; gap: 14px; min-width: 0; }
+
+.topbar h1 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.composer { color: var(--ink-faint); font-size: 13px; white-space: nowrap; }
+
+.topbar-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+/* ── 操作バー ──────────────────────────────── */
+
+.controlbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 8px 26px;
+  padding: 8px 24px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg-soft);
+}
+
+.group { display: flex; flex-direction: column; gap: 2px; }
+
+.group-label {
+  font-size: 11px;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+/* ── ボタン類 ─────────────────────────────── */
+
+.btn {
+  padding: 4px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+  transition: background 0.12s, border-color 0.12s;
+}
+
+.btn:hover:not(:disabled) { background: var(--bg-soft); border-color: var(--ink-faint); }
+.btn:disabled { color: var(--ink-faint); cursor: not-allowed; }
+
+.btn-primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.btn-primary:hover:not(:disabled) { background: #16294e; border-color: #16294e; }
+.btn-primary:disabled { background: var(--line); border-color: var(--line); color: #fff; }
+
+.segmented {
+  display: flex;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  overflow: hidden;
+  background: #fff;
+}
+
+.seg {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 12px;
+  border: 0;
+  border-right: 1px solid var(--line-soft);
+  background: transparent;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.seg:last-child { border-right: 0; }
+.seg:hover { background: var(--bg-soft); }
+
+.seg-on {
+  background: var(--accent);
+  color: #fff;
+}
+
+.seg-on:hover { background: var(--accent); }
+
+.seg-num {
+  font-size: 10px;
+  color: var(--ink-faint);
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  padding: 0 3px;
+  line-height: 1.4;
+}
+
+.seg-on .seg-num { color: rgba(255, 255, 255, 0.75); }
+
+.segmented-sm .seg { padding: 4px 9px; font-size: 12px; }
+
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  cursor: pointer;
+}
+
+.toggle-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line);
+}
+
+.toggle-on { border-color: var(--accent); color: var(--accent); }
+.toggle-on .toggle-dot { background: var(--accent); }
+
+.field { display: inline-flex; align-items: center; gap: 6px; color: var(--ink-soft); }
+
+.field input {
+  width: 72px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+}
+
+.field-block { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.field-block input { width: 100%; }
+
+.readout { color: var(--ink-soft); font-variant-numeric: tabular-nums; }
+
+/* ── 中央：五線譜 ──────────────────────────── */
+
+.workspace {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.sheet {
+  flex: 1;
+  min-width: 0;
+  overflow: auto;
+  padding: 16px 32px 32px;
+  background: #fff;
+}
+
+.sheet-empty { display: flex; align-items: center; justify-content: center; }
+
+.empty-box {
+  max-width: 440px;
+  text-align: center;
+  color: var(--ink-soft);
+}
+
+.empty-title { font-size: 15px; color: var(--ink); margin: 0 0 12px; }
+.empty-body { margin: 0 0 20px; }
+.empty-note { margin: 0; font-size: 12px; color: var(--ink-faint); }
+
+.sample-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+/* ── 五線譜（OSMD） ────────────────────────── */
+
+.sheet-tools {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--line-soft);
+
+  /* 自動スクロールで楽譜が動いても、操作は手元に残す */
+  position: sticky;
+  top: -16px;
+  z-index: 2;
+  background: #fff;
+  margin: -16px -32px 14px;
+  padding: 16px 32px 8px;
+}
+
+.sheet-mode { font-size: 12px; color: var(--ink-faint); letter-spacing: 0.06em; }
+
+.sheet-tools-right { display: flex; align-items: center; gap: 12px; }
+
+.sheet-tools-right .toggle { padding: 4px 10px; font-size: 12px; }
+
+.per-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--ink-soft);
+}
+
+.per-line select {
+  padding: 3px 6px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  font-size: 12px;
+}
+
+.zoom { display: flex; align-items: center; gap: 4px; }
+.zoom-value {
+  min-width: 46px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.btn-icon { padding: 2px 10px; line-height: 1.5; }
+
+.fit-note {
+  margin: 0 0 12px;
+  padding: 8px 12px;
+  background: #fffaf0;
+  border: 1px solid #f0e0c0;
+  border-radius: var(--radius);
+  color: #6b5320;
+  font-size: 12px;
+}
+
+.osmd-wrap { position: relative; }
+
+.osmd-status {
+  margin: 0 0 12px;
+  color: var(--ink-faint);
+  font-size: 12px;
+}
+
+/* OSMD が中身を書き換える領域。React からは触らない */
+.osmd-host svg { max-width: 100%; }
+
+/* ── 曲を選ぶ（指示書§31） ─────────────────────── */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  background: rgba(26, 26, 26, 0.32);
+  z-index: 10;
+}
+
+.dialog {
+  width: 100%;
+  max-width: 640px;
+  max-height: 80vh;
+  overflow-y: auto;
+  padding: 24px 28px 28px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.18);
+}
+
+.dialog-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.dialog-head h2 { margin: 0; font-size: 15px; font-weight: 600; letter-spacing: 0; color: var(--ink); }
+
+.library { list-style: none; margin: 0 0 18px; padding: 0; }
+
+.library li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+
+.library-current { background: var(--accent-soft); }
+
+.library-open {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 4px 8px;
+  border: 0;
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  min-width: 0;
+}
+
+.library-open:hover { background: var(--bg-soft); }
+
+.library-title { font-weight: 600; }
+
+.library-meta {
+  display: flex;
+  gap: 12px;
+  font-size: 12px;
+  color: var(--ink-faint);
+}
+
+.library-state { font-size: 12px; color: var(--ink-soft); }
+
+.library-remove { flex-shrink: 0; font-size: 12px; padding: 4px 10px; }
+.library-confirm { display: flex; gap: 6px; flex-shrink: 0; }
+
+.btn-danger { border-color: #c08080; color: #8c3a3a; }
+.btn-danger:hover:not(:disabled) { background: #fdf3f3; border-color: #8c3a3a; }
+
+/* ── 役割の判定（サイドパネル内） ────────────────── */
+
+.roles { margin-bottom: 24px; }
+
+.role-bars { list-style: none; margin: 6px 0 0; padding: 0; }
+
+.role-bars li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+}
+
+.role-name { width: 52px; font-size: 12px; color: var(--ink-soft); }
+
+.role-bar {
+  flex: 1;
+  height: 6px;
+  background: var(--line-soft);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.role-fill { display: block; height: 100%; }
+.role-fill-known { background: var(--accent); }
+.role-fill-unknown { background: #c9a227; }
+
+.role-count {
+  width: 32px;
+  text-align: right;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.role-zero .role-name,
+.role-zero .role-count { color: var(--ink-faint); }
+
+/* ── 読み取り結果（サイドパネル内） ──────────────── */
+
+.section-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+}
+
+.section-toggle h2 { margin: 0 0 10px; }
+.section-mark { color: var(--ink-faint); font-size: 13px; }
+
+.info-list { margin: 4px 0 0; }
+.info-list > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 3px 0;
+  border-bottom: 1px solid var(--line-soft);
+}
+.info-list dt { font-size: 12px; color: var(--ink-faint); }
+.info-list dd { margin: 0; font-size: 12px; font-variant-numeric: tabular-nums; }
+
+.warning-list-sm {
+  margin-bottom: 10px;
+  padding: 8px 12px 8px 26px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.warning-list {
+  margin: 0;
+  padding: 12px 16px 12px 32px;
+  background: #fffaf0;
+  border: 1px solid #f0e0c0;
+  border-radius: var(--radius);
+  color: #6b5320;
+}
+
+.errorbox {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 12px 16px;
+  background: #fdf3f3;
+  border: 1px solid #e8c8c8;
+  border-radius: var(--radius);
+  color: #8c3a3a;
+  text-align: left;
+}
+
+.errorbox p { margin: 0; }
+
+
+/* ── サイド：現在位置・ループ・補助 ──────────────── */
+
+.sidepanel {
+  width: 268px;
+  flex-shrink: 0;
+  padding: 18px 18px;
+  border-left: 1px solid var(--line);
+  overflow-y: auto;
+  background: var(--bg-soft);
+}
+
+.sidepanel section { margin-bottom: 32px; }
+.sidepanel section:last-child { margin-bottom: 0; }
+
+.sidepanel h2 {
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  color: var(--ink-faint);
+}
+
+.countin {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 12px;
+  color: var(--accent);
+}
+
+.countin-number { font-size: 30px; font-variant-numeric: tabular-nums; }
+.countin-label { font-size: 12px; letter-spacing: 0.08em; }
+
+.position-beat-on { color: var(--accent); }
+
+.position { display: flex; align-items: baseline; gap: 6px; margin-bottom: 12px; }
+.position-measure { font-size: 30px; font-variant-numeric: tabular-nums; }
+.position-unit { color: var(--ink-soft); }
+.position-beat { margin-left: auto; color: var(--ink-soft); }
+
+.tilde { color: var(--ink-faint); }
+
+.hint { margin: 8px 0 0; font-size: 12px; color: var(--ink-faint); line-height: 1.6; }
+
+.assist-list { list-style: none; margin: 10px 0 0; padding: 0; }
+.assist-list li { margin-bottom: 4px; }
+
+.checkline { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.checkline input { accent-color: var(--accent); }
+
+/* ── 画面が狭いとき（将来のiPad対応の下地） ──────── */
+
+@media (max-width: 900px) {
+  .workspace { flex-direction: column; }
+  .sidepanel { width: 100%; border-left: 0; border-top: 1px solid var(--line); }
+}
+
+
+/* ── 無窮動トレーナー固有 ───────────────────── */
+
+.topbar { gap: 14px; }
+.topbar h1 { letter-spacing: 0.01em; }
+.topbar-tagline { color: var(--ink-soft); font-size: 12px; }
+.topbar-sub { margin-left: auto; color: var(--ink-faint); font-size: 13px; }
+
+.group-wide { flex: 1 1 auto; min-width: 0; }
+
+.sheet-note { font-size: 12px; color: var(--ink-faint); }
+
+.chord-now {
+  margin: 4px 0 2px;
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.chord-list {
+  display: flex;
+  gap: 6px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+  flex-wrap: wrap;
+}
+
+.chord-list li {
+  padding: 3px 9px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  background: #fff;
+  font-size: 13px;
+}
+
+.position-unit { color: var(--ink-soft); font-size: 13px; }
