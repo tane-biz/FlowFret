@@ -530,7 +530,7 @@ button, input { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 
-/* ── 無窮動トレーナー固有 ───────────────────── */
+/* ── FlowFret 固有 ──────────────────────────── */
 
 .topbar { gap: 14px; }
 .topbar h1 { letter-spacing: 0.01em; }
